@@ -16,6 +16,8 @@ import (
 
 //go:embed default.json
 var defaultJson string
+//go:embed defaultOtherToProxy.json
+var defaultOtherToProxy string
 
 type SubJsonService struct {
 	configJson       map[string]interface{}
@@ -44,7 +46,10 @@ func NewSubJsonService(fragment string, noises string, mux string, rules string,
 		routing, _ := configJson["routing"].(map[string]interface{})
 		defaultRules, _ := routing["rules"].([]interface{})
 		json.Unmarshal([]byte(rules), &newRules)
-		defaultRules = append(newRules, defaultRules...)
+		defaultRules = append(defaultRules, newRules...)
+		var otherToProxy map[string]interface{}
+		json.Unmarshal([]byte(defaultOtherToProxy), &otherToProxy)
+		defaultRules = append(defaultRules, otherToProxy)
 		routing["rules"] = defaultRules
 		configJson["routing"] = routing
 	}
