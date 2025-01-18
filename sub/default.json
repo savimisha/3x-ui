@@ -4,10 +4,7 @@
     "tag": "dns_out",
     "queryStrategy": "UseIP",
     "servers": [
-      {
-        "address": "8.8.8.8",
-        "skipFallback": false
-      }
+      "https://1.1.1.1/dns-query"
     ]
   },
   "inbounds": [
@@ -17,7 +14,7 @@
       "settings": {
         "auth": "noauth",
         "udp": true,
-        "userLevel": 8
+        "userLevel": 1
       },
       "sniffing": {
         "destOverride": [
@@ -29,14 +26,6 @@
         "enabled": true
       },
       "tag": "socks"
-    },
-    {
-      "port": 10809,
-      "protocol": "http",
-      "settings": {
-        "userLevel": 8
-      },
-      "tag": "http"
     }
   ],
   "log": {
@@ -54,17 +43,12 @@
     },
     {
       "tag": "block",
-      "protocol": "blackhole",
-      "settings": {
-        "response": {
-          "type": "http"
-        }
-      }
+      "protocol": "blackhole"
     }
   ],
   "policy": {
     "levels": {
-      "8": {
+      "1": {
         "connIdle": 300,
         "downlinkOnly": 1,
         "handshake": 4,
@@ -81,8 +65,31 @@
     "rules": [
       {
         "type": "field",
-        "network": "tcp,udp",
+        "ip": [
+          "1.1.1.1"
+        ],
         "outboundTag": "proxy"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
       }
     ]
   },
